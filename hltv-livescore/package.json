@@ -1,0 +1,100 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "hltv-livescore",
+        "scope": null,
+        "escapedName": "hltv-livescore",
+        "name": "hltv-livescore",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "C:\\temp\\livescore"
+    ]
+  ],
+  "_from": "hltv-livescore@latest",
+  "_id": "hltv-livescore@1.2.0",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/hltv-livescore",
+  "_nodeVersion": "6.3.1",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/hltv-livescore-1.2.0.tgz_1482381393708_0.1787319122813642"
+  },
+  "_npmUser": {
+    "name": "andrewda",
+    "email": "dassonville.andrew@gmail.com"
+  },
+  "_npmVersion": "3.10.3",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "hltv-livescore",
+    "scope": null,
+    "escapedName": "hltv-livescore",
+    "name": "hltv-livescore",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/hltv-livescore/-/hltv-livescore-1.2.0.tgz",
+  "_shasum": "54cc6fe8f0f8bec74f11542e082ed71c7870e4e1",
+  "_shrinkwrap": null,
+  "_spec": "hltv-livescore",
+  "_where": "C:\\temp\\livescore",
+  "author": {
+    "name": "Andrew Dassonville",
+    "email": "dassonville.andrew@gmail.com",
+    "url": "http://drewbits.com"
+  },
+  "bugs": {
+    "url": "https://github.com/andrewda/hltv-livescore/issues"
+  },
+  "dependencies": {
+    "socket.io-client": "^1.3.5",
+    "steamid": "^1.1.0"
+  },
+  "description": "An HLTV scorebot wrapper",
+  "devDependencies": {
+    "eslint": "^3.2.2"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "54cc6fe8f0f8bec74f11542e082ed71c7870e4e1",
+    "tarball": "https://registry.npmjs.org/hltv-livescore/-/hltv-livescore-1.2.0.tgz"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "gitHead": "d766c94ca52257bfe2c7d0a6d8b401e0ecb29f73",
+  "homepage": "https://github.com/andrewda/hltv-livescore#readme",
+  "keywords": [
+    "hltv",
+    "scorebot",
+    "live",
+    "score"
+  ],
+  "license": "MIT",
+  "main": "Livescore.js",
+  "maintainers": [
+    {
+      "name": "andrewda",
+      "email": "andrew.dassonville@gmail.com"
+    }
+  ],
+  "name": "hltv-livescore",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrewda/hltv-livescore.git"
+  },
+  "scripts": {
+    "test": "./node_modules/eslint/bin/eslint.js ./*/*.js"
+  },
+  "version": "1.2.0"
+}
