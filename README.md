@@ -4,11 +4,12 @@
 
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
+- [Usage](#usage)
 - [Methods](#methods)
 - [Events](#events)
 - [Classes](#classes)
 - [Enums](#enums)
-- [Examples](#examples)
+
 
 ## Introduction
 
@@ -18,20 +19,24 @@ This is a wrapper for [andrewda](https://github.com/andrewda)'s [hltv-scorebot](
 
 Create an empty git repository with a logs directory at the root, e.g.
 
- * root folder
-   * livescore
-   * logs
+```
+.
+root folder
+|-- livescore (Git repo)
+|-- logs
+```
 
 **Install with npm:**
 
-In your livescore folder
+CD to your *livescore folder* and create a Git repository:
 ```CMD
+$ cd livescore
 $ git init
 $ git clone path-to-this-repo
 $ npm install
 ```
 
-**Usage:**
+## Usage
 ```CMD
 node index.js [listid]
 ```
