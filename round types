@@ -1,0 +1,15 @@
+pistol?
+{
+  "type": 7,
+  "round": 1
+}
+B?
+{
+  "type": 3,
+  "round": 2
+}
+C,D?
+{
+  "type": 2,
+  "round": 3+
+}

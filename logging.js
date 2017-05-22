@@ -2,6 +2,7 @@
 
 var util = require('util'),
   winston = require('winston'),
+  path = require("path"),
   logger = new winston.Logger(),
   production = (process.env.NODE_ENV || '').toLowerCase() === 'production',
   listid = process.argv[2];
@@ -20,7 +21,7 @@ switch((process.env.NODE_ENV || '').toLowerCase()){
   case 'production':
     production = true;
     logger.add(winston.transports.File, {
-      filename: '../logs/' + listid + '.log',
+      filename: path.join(__dirname, '..', listid + '.log'), // '../logs/' + listid + '.log',
       handleExceptions: true,
       exitOnError: false,
       level: 'info'
@@ -37,7 +38,7 @@ switch((process.env.NODE_ENV || '').toLowerCase()){
     });
 
     logger.add(winston.transports.File, {
-      filename: '../logs/' + listid + '.log',
+      filename: path.join(__dirname, '..', listid + '.log'), // '../logs/' + listid + '.log',
       handleExceptions: true,
       exitOnError: false,
       level: 'info'

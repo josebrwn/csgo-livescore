@@ -14,7 +14,27 @@ var map;
 var isLive = false;
 var path = require('path'); // fixes paths in windows & unix
 console.log(path.join(__dirname, '..', listid + '.log'));
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html');
+});
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+  socket.on('chat message', function(msg){
+    console.log('message: ' + msg);
+    io.emit('chat message', msg);
+  });
+});
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // write to log file
 // util = require('util');
 var CircularJSON = require('circular-json'); // expands objects and handles circular references
@@ -27,7 +47,6 @@ var currentTime = () => {
   replace(/\..+/, '');
   return _time;
 };
-
 // events
 
 // Emitted every time the timer on the scoreboard is updated.
@@ -50,11 +69,17 @@ live.on('clock', function(data) {
 });
 
 // debug info - add wherenever needed to clarify events
-// live.on('debug', function(data) {
-//   console.log('***');
-//   console.log('***', 'debug', data);
-//   console.log('***');
-// });
+live.on('debug', function(data) {
+  console.log('***');
+  console.log('***', 'debug', data);
+  console.log('***');
+  try {
+    io.emit('chat message', data);
+  }
+  catch (err) {
+    console.log(err);
+  }
+});
 
 // Emitted whenever HLTV feels like giving us logs (after kills, round events, etc)
 live.on('log', function(data) {
@@ -214,4 +239,9 @@ live.on('playerJoin', function(data) {
 live.on('playerQuit', function(data) {
   console.log('***', 'playerQuit');
   // console.log('***', currentTime());
+});
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+http.listen(3000, function(){
+  console.log('listening on *:3000');
 });
