@@ -9,7 +9,7 @@ var lg = io.of('/livegames');
 
 // global variables
 var all_rooms = [];
-var old_streams = [];
+var old_streams = []; // creates an array of streams, but has same behavior as just creating a new livestream each time
 
 // start the server
 app.get('/', function(req, res){
@@ -35,7 +35,7 @@ lg.on('connection', function(socket){
       console.log('I am connected to room id', id);
       if (id == parseInt(id, 10)) {
         console.log('attempting to leave integer room', id);
-        socket.leave(room);
+        socket.leave(id.toString());
       }
     }
     console.log('I am now in rooms', socket.rooms);
@@ -57,15 +57,15 @@ lg.on('connection', function(socket){
     // }
 
     console.log('livestream listid is', livestream["listid"]); // neat! this object represents the actual connection
-    lg.to(room).emit('msg_to_client', livestream["listid"]);
+    lg.in(room).emit('msg_to_client', livestream["listid"]);
 
     livestream.on('raw', function(data) {
       try {
         // console.log(data);
-        lg.to(room).emit('msg_to_client', CircularJSON.stringify(data, null, 2));
-        lg.to(room).emit('msg_to_client', 'I am in room ' + room);
-        lg.to(room).emit('msg_to_client', 'all my rooms ' + CircularJSON.stringify(socket.rooms, null, 2));
-        lg.to(room).emit('msg_to_client', 'my socket id ' + socket.id);
+        lg.in(room).emit('msg_to_client', CircularJSON.stringify(data, null, 2));
+        lg.in(room).emit('msg_to_client', 'I am in room ' + room);
+        lg.in(room).emit('msg_to_client', 'all my rooms ' + CircularJSON.stringify(socket.rooms, null, 2));
+        lg.in(room).emit('msg_to_client', 'my socket id ' + socket.id);
       }
       catch (err) {console.log(err);}
     });
