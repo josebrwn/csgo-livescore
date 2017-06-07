@@ -1,137 +1,91 @@
-var io = require('socket.io-client');
+// exposed automatically by the socket.io server as /socket.io/socket.io.js
+  var io = require('socket.io-client');
+var patch = require('socketio-wildcard')(io.Manager);
 var EE = require('events').EventEmitter;
-var inherits = require('util').inherits;
-
-var CONNECTION = 'http://scorebot2.hltv.org';
+var inherits = require('util').inherits; // inherits module uses prototypes to add methods
+var CONNECTION = 'http://scorebot2.hltv.org'; // https://scorebot-secure.hltv.org port 443
 var PORT = 10022;
+var self; // 'this', the io client
 
-var self;
-
+// Livescore module exports a socket.io-client
+// options "listid" is sent to the module when it's invoked
+//
 function Livescore(options) {
-  self = this;
-
+  self = this; // socket.io-client
   options = options || {};
-
-  self.connected = false;
-  self.started = false;
-
   self.listid = options.listid || null;
   self.url = options.url || CONNECTION;
   self.port = options.port || PORT;
+  self.socket = io(self.url + ':' + self.port); // socket.io-client invoked
+  patch(self.socket); // piggyback socketio-wildcard
 
-  self.socket = io(self.url + ':' + self.port);
-
+  self.connected = false;
+  self.started = false;
   self.time = 0;
   self.map;
   self.interval;
-
   self.scoreboard;
-
   self.players = {};
   self.teams = {};
-
   self.kills = 0;
   self.knifeKills = 0;
-
   self._lastLog;
-
   self.options = {};
-
   self.options[Livescore.Enums.EOption['ROUND_TIME']] = options.roundTime || 115; // 105 before update
   self.options[Livescore.Enums.EOption['BOMB_TIME']] = options.bombTime || 40; // 35 before update
   self.options[Livescore.Enums.EOption['FREEZE_TIME']] = options.freezeTime || 15;
-
+  // there are 3 original events: connect, scoreboard, and log.
+  // the rest we create and invoke while parsing the log
   self.socket.on('connect', self._onConnect);
 }
 
-inherits(Livescore, EE);
-
+inherits(Livescore, EE); // modules: inherits and event emitter
 Livescore.Enums = require('../Livescore.js').Enums;
 Livescore.Classes = require('../Livescore.js').Classes;
 
-Livescore.prototype.start = function(options, callback) {
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
-  }
-
-  options = options || {};
-
-  self.listid = options.listid || self.listid;
-
-  if (self.connected) {
-    self.socket.emit('readyForMatch', self.listid);
-
-    if (callback) {
-      callback(null);
-    }
-  } else if (callback) {
-    callback(new Error('Not yet connected to HLTV'));
-  }
-};
-
-Livescore.prototype.disconnect = function() {
-  self.connected = false;
-  self.socket.disconnect();
-};
-
-Livescore.prototype.getPlayers = function(callback) {
-  callback(self.players);
-};
-
-Livescore.prototype.getTeams = function(callback) {
-  callback(self.teams);
-};
-
-Livescore.prototype.setTime = function(time) {
-  clearInterval(self.interval);
-  self.time = time;
-  self.emit('clock', self.time);
-  self.interval = setInterval(() => {
-    var _s;
-    self.time = self.time - 1;
-    _s = Number(self.time);
-    if (_s % 5 === 0 && _s > -1) {
-      self.emit('time', self.time);
-    }
-  }, 1000);
-};
-
-Livescore.prototype.getTime = function(callback) {
-  callback(self.time);
-};
-
+// invoked by hltv connect event
 Livescore.prototype._onConnect = function() {
   if (!self.connected) {
     self.connected = true;
-
-    self.socket.on('log', self._onLog);
-    self.socket.on('scoreboard', self._onScoreboard);
-
-    self.emit('connected');
+    // these are the only other hltv events
+    // *************************************************************************** //
+    // self.socket.on('log', self._onLog);
+    // self.socket.on('scoreboard', self._onScoreboard);
+    // *************************************************************************** //
+    // NB captures everything
+    self.socket.on('*', self._onReceive);
   }
 
+  /*
+  readyForMatch expects a single string:
+  self.gamesList = '2310804';
+  readyForScores expects an integer array:
+  self.gamesList = [2310804];
+  */
   if (self.listid) {
     self.socket.emit('readyForMatch', self.listid);
   }
 };
 
-Livescore.prototype._onReconnect = function() {
-  self.socket.emit('readyForMatch', self.listid);
+// invoked by hltv connect event
+Livescore.prototype._onReceive = function(data) {
+  self.emit('raw', data);
 };
 
+// When using raw data, just ignore everything below this point ****************** //
+
+// invoked by hltv connect event
 Livescore.prototype._onLog = function(logs) {
   try {
     logs = JSON.parse(logs).log.reverse();
   } catch (err) {
     logs = null;
-
     self.emit('debug', err);
   }
 
   if (logs && logs !== self._lastLog) {
     self.emit('log', logs);
-
+    // self.emit('debug', logs);
     self.getPlayers((players) => {
       if (Object.keys(players).length && logs) {
         logs.forEach((log) => {
@@ -168,6 +122,7 @@ Livescore.prototype._onLog = function(logs) {
   }
 };
 
+// invoked by hltv connect event
 Livescore.prototype._onScoreboard = function(event) {
   if (!self.started) {
     self.started = true;
@@ -186,6 +141,12 @@ Livescore.prototype._onScoreboard = function(event) {
   });
 };
 
+// invoked by log
+Livescore.prototype._onReconnect = function() {
+  self.socket.emit('readyForMatch', self.listid);
+};
+
+// invoked by log
 Livescore.prototype._onKill = function(event) {
   self.getPlayers((players) => {
     self.emit('kill', {
@@ -204,6 +165,7 @@ Livescore.prototype._onKill = function(event) {
   }
 };
 
+// invoked by log
 Livescore.prototype._onSuicide = function(event) {
   self.getPlayers((players) => {
     self.emit('suicide', {
@@ -212,6 +174,7 @@ Livescore.prototype._onSuicide = function(event) {
   });
 };
 
+// invoked by log
 Livescore.prototype._onBombPlanted = function(event) {
   self.setTime(self.options[Livescore.Enums.EOption['BOMB_TIME']]);
 
@@ -222,6 +185,7 @@ Livescore.prototype._onBombPlanted = function(event) {
   });
 };
 
+// invoked by log
 Livescore.prototype._onBombDefused = function(event) {
   self.getPlayers((players) => {
     self.emit('bombDefused', {
@@ -230,10 +194,12 @@ Livescore.prototype._onBombDefused = function(event) {
   });
 };
 
+// invoked by log
 Livescore.prototype._onMatchStarted = function(event) {
   self.emit('matchStart', event);
 };
 
+// invoked by log
 Livescore.prototype._onRoundStart = function() {
   self.setTime(self.options[Livescore.Enums.EOption["ROUND_TIME"]]);
   self.emit('roundStart', {
@@ -244,6 +210,7 @@ Livescore.prototype._onRoundStart = function() {
   self.knifeKills = 0;
 };
 
+// invoked by log
 Livescore.prototype._onRoundEnd = function(event) {
   var winner = Livescore.Enums.ESide[event.winner === 'TERRORIST' ? 'TERRORIST' : 'COUNTERTERRORIST'];
 
@@ -268,12 +235,14 @@ Livescore.prototype._onRoundEnd = function(event) {
   });
 };
 
+// invoked by log
 Livescore.prototype._onPlayerJoin = function(event) {
   self.emit('playerJoin', {
     playerName: event.playerName
   });
 };
 
+// invoked by log
 Livescore.prototype._onPlayerQuit = function(event) {
   self.getPlayers((players) => {
     self.emit('playerQuit', {
@@ -282,14 +251,53 @@ Livescore.prototype._onPlayerQuit = function(event) {
   });
 };
 
+// invoked by log
 Livescore.prototype._onRestart = function() {
   self.emit('restart');
 };
 
+// invoked by log
 Livescore.prototype._onMapChange = function(event) {
   self.emit('mapChange', event);
 };
 
+// prototype function. called elsewhere.
+Livescore.prototype.disconnect = function() {
+  self.connected = false;
+  self.socket.disconnect();
+};
+
+// prototype function. called elsewhere.
+Livescore.prototype.getPlayers = function(callback) {
+  callback(self.players);
+};
+
+// prototype function. called elsewhere.
+Livescore.prototype.getTeams = function(callback) {
+  callback(self.teams);
+};
+
+// prototype function. called elsewhere.
+Livescore.prototype.setTime = function(time) {
+  clearInterval(self.interval);
+  self.time = time;
+  self.emit('clock', self.time);
+  self.interval = setInterval(() => {
+    var _s;
+    self.time = self.time - 1;
+    _s = Number(self.time);
+    if (_s % 5 === 0 && _s > -1) {
+      self.emit('time', self.time);
+    }
+  }, 1000);
+};
+
+// prototype function. called elsewhere.
+Livescore.prototype.getTime = function(callback) {
+  callback(self.time);
+};
+
+// global function. only used once.
 function updateGame(scoreboard) {
   var tPlayers = [];
   var ctPlayers = [];

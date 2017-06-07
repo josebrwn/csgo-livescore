@@ -21,7 +21,7 @@ switch((process.env.NODE_ENV || '').toLowerCase()){
   case 'production':
     production = true;
     logger.add(winston.transports.File, {
-      filename: path.join(__dirname, '..', listid + '.log'), // '../logs/' + listid + '.log',
+      filename: path.join(__dirname, '../logs/', listid + '.log'), // '../logs/' + listid + '.log',
       handleExceptions: true,
       exitOnError: false,
       level: 'info'
@@ -38,7 +38,7 @@ switch((process.env.NODE_ENV || '').toLowerCase()){
     });
 
     logger.add(winston.transports.File, {
-      filename: path.join(__dirname, '..', listid + '.log'), // '../logs/' + listid + '.log',
+      filename: path.join(__dirname, '../logs/', listid + '.log'), // '../logs/' + listid + '.log',
       handleExceptions: true,
       exitOnError: false,
       level: 'info'
