@@ -18,9 +18,11 @@ app.get('/', function(req, res){
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
+
 // const listid = process.argv[2];
 // var live = new Livescore({listid});
 // console.log(live);
+
 lg.on('connection', function(socket){
   console.log( 'User ' + socket.id + ' connected' );
   socket.on('disconnect', function(){
@@ -38,13 +40,13 @@ lg.on('connection', function(socket){
         socket.leave(id.toString());
       }
     }
-    console.log('I am now in rooms', socket.rooms);
+    console.log('I am now in rooms', socket.rooms); // TODO priority. make sure clients can move about freely FIRST.
     // assign requesting user to the new room
     // socket.disconnect();
     socket.join(room);
     console.log('and now, I am in rooms', socket.rooms);
 
-    livestream = new Livescore({listid: room});
+    livestream = new Livescore({listid: room}); // TODO suss this out. move livestream creation outside scope of current socket. SECOND.
     // if room does not exist, create new livestream
     if (all_rooms.includes(room) == false) {
       all_rooms.push(room);

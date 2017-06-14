@@ -1,5 +1,5 @@
 // exposed automatically by the socket.io server as /socket.io/socket.io.js
-  var io = require('socket.io-client');
+var io = require('socket.io-client');
 var patch = require('socketio-wildcard')(io.Manager);
 var EE = require('events').EventEmitter;
 var inherits = require('util').inherits; // inherits module uses prototypes to add methods
@@ -11,7 +11,7 @@ var self; // 'this', the io client
 // options "listid" is sent to the module when it's invoked
 //
 function Livescore(options) {
-  self = this; // socket.io-client
+  self = this; // the calling context (Livescore) object with a socket = socket.io-client, inheriting from EventEmitter.
   options = options || {};
   self.listid = options.listid || null;
   self.url = options.url || CONNECTION;
@@ -49,11 +49,10 @@ Livescore.prototype._onConnect = function() {
     self.connected = true;
     // these are the only other hltv events
     // *************************************************************************** //
-    // self.socket.on('log', self._onLog);
-    // self.socket.on('scoreboard', self._onScoreboard);
+    self.socket.on('log', self._onLog);
+    self.socket.on('scoreboard', self._onScoreboard);
+    self.socket.on('*', self._onReceive); // NB uses wildcard * - captures everything
     // *************************************************************************** //
-    // NB captures everything
-    self.socket.on('*', self._onReceive);
   }
 
   /*
@@ -69,6 +68,7 @@ Livescore.prototype._onConnect = function() {
 
 // invoked by hltv connect event
 Livescore.prototype._onReceive = function(data) {
+  data["listid"] = self.listid; // NB adding the listid to the raw data makes it available to the client
   self.emit('raw', data);
 };
 
@@ -85,9 +85,9 @@ Livescore.prototype._onLog = function(logs) {
 
   if (logs && logs !== self._lastLog) {
     self.emit('log', logs);
-    // self.emit('debug', logs);
+    // getPlayers is a callback for the players object
     self.getPlayers((players) => {
-      if (Object.keys(players).length && logs) {
+      if (Object.keys(players).length && logs) { // "data": ["log","{"log":[{
         logs.forEach((log) => {
           var event;
 
@@ -107,7 +107,7 @@ Livescore.prototype._onLog = function(logs) {
               case 'MatchStarted':
               case 'Restart':
               case 'Suicide':
-                self['_on' + event](log[event]);
+                self['_on' + event](log[event]); // dynamically calling events. the "_" is superfluous.
                 break;
               default:
                 self.emit('debug', 'unrecognized event: ' + event);
