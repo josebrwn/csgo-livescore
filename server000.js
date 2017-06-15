@@ -1,5 +1,5 @@
 'use strict';
-// server0.js. this iteration tries to use a prototype to emit messages. NB added raw data["listid"] here.
+// server0.js. this iteration tries to use a prototype to emit messages. NB added raw data["listid"] here. added string fix to dataStr here.
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
