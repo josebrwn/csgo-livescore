@@ -38,9 +38,9 @@ lg.on('connection', function(socket){
     // socket.room = room; // TODO recheck this: does it fix the problem of a room mixing up data['listid']? i.e. labelling 2311427 onto another stream?
     socket.join(room);
     lg.in(room).emit('msg_to_client', socket.id + ' has joined room ' + room);
-    if ([all_rooms].includes(room) == false) {
-      all_rooms.push(room);
-    }
+    // if ([all_rooms].includes(room) == false) {
+    //   all_rooms.push(room);
+    // }
     if (livestream != undefined) {
       livestream.disconnect(); // TODO does this disconnect all users in the current room, or only the current user?
     }
