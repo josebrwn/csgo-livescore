@@ -17,7 +17,7 @@ function Livescore(options) {
   self.url = options.url || CONNECTION;
   self.port = options.port || PORT;
   // socket.io-client invoked
-  self.socket = io.connect(self.url + ':' + self.port, {'force new connection': true}); // 6-15-17, added force new connection
+  self.socket = io.connect(self.url + ':' + self.port, {reconnection: false, forceNew: true}); // 6-15-17, added force new connection
   patch(self.socket); // piggyback socketio-wildcard
 
   self.connected = false;
