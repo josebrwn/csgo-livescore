@@ -100,39 +100,45 @@ live.on('scoreboard', function(data) {
     }
     console.log('map:', map);
     process.send({ message: map });
-    console.log('currentRound:', currentround);
+    console.log('currentRound: ', currentround);
     process.send({ message: 'current round: ' + currentround });
-    console.log('bombPlanted:', bombplanted);
+    console.log('bombPlanted :', bombplanted);
     process.send({ message: 'bomb planted: ' + bombplanted });
-    console.log('Terrorists:', data.teams[1].name + '(' + data.teams[1].id + ')', ':', t1score);
-    process.send({ message: 'Terrorists: ' + data.teams[1].name + '(' + data.teams[1].id + ')' + ': ' + t1score });
-    console.log('CounterTerrorists:', data.teams[2].name + '(' + data.teams[2].id + ')', ':', t2score);
-    process.send({ message: 'CounterTerrorists:' + data.teams[2].name + '(' + data.teams[2].id + ')' + ': ' + t2score });
+    console.log('Terrorists: ', data.teams[1].name + ' (' + data.teams[1].id + ')', ':', t1score);
+    process.send({ message: 'Terrorists: ' + data.teams[1].name + ' (' + data.teams[1].id + ')' + ': ' + t1score });
+    console.log('CounterTerrorists: ', data.teams[2].name + '(' + data.teams[2].id + ')', ':', t2score);
+    process.send({ message: 'CounterTerrorists:' + data.teams[2].name + ' (' + data.teams[2].id + ')' + ': ' + t2score });
     }
 });
 
 // Emitted after every kill.
 live.on('kill', function(data) {
   console.log(data.killer.name, '<' + data.killer.team.name + '('+ data.killerside +')>', ' killed ', data.victim.name, '<' + data.victim.team.name + '('+ data.victimside +')>', 'with', data.weapon, data.headshot ? '(headshot)' : '');
-  process.send({ message: data.killer.name + '<' + data.killer.team.name + '('+ data.killerside +')>' + ' killed ' + data.victim.name + '<' + data.victim.team.name + '('+ data.victimside +')>' + ' with ' + data.weapon + data.headshot ? '(headshot)' : '' });
+  process.send({ message: data.killer.name + ' <' + data.killer.team.name + ' ('+ data.killerside +')>' + ' killed ' + data.victim.name + ' <' + data.victim.team.name + ' ('+ data.victimside +')> ' + 'with: ' + data.weapon + ", headshot: " + data.headshot });
 });
 
 // Emitted after a player commits suicide
 live.on('suicide', function(data) {
-  console.log('suicide: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
-  process.send({ message: 'suicide: ' + data.player.name + '(' + data.player.hltvid + ')' + '<' + data.player.team.name + '(' + data.player.team.id + ')>'  });
+  if (data.player != undefined) {
+    console.log('suicide: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
+    process.send({ message: 'suicide: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
+  }
 });
 
 // Emitted when the bomb is planted
 live.on('bombPlanted', function(data) {
-  console.log('bomb planted: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
-  process.send({ message: 'bomb planted: ' + data.player.name + '(' + data.player.hltvid + ')' + '<' + data.player.team.name + '(' + data.player.team.id + ')>'  });
+  if (data.player != undefined) {
+    console.log('bomb planted: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
+    process.send({ message: 'bomb planted: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
+  }
 });
 
 // Emitted when the bomb is defused
 live.on('bombDefused', function(data) {
-  console.log('bomb defused: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
-  process.send({ message: 'bomb defused: ' + data.player.name + '(' + data.player.hltvid + ')' + '<' + data.player.team.name + '(' + data.player.team.id + ')>'  });
+  if (data.player != undefined) {
+    console.log('bomb defused: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
+    process.send({ message: 'bomb defused: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
+  }
 });
 
 // Emitted at the start of every match
@@ -169,12 +175,16 @@ live.on('mapChange', function(data) {
 
 // Emitted when the map is changed.
 live.on('playerJoin', function(data) {
-  console.log('player join', data.player.name + '(' + data.player.hltvid + ')');
-  process.send({ message: 'player join' + data.player.name + '(' + data.player.hltvid + ')' });
+  if (data.player != undefined) {
+    console.log('player join', data.player.name + ' (' + data.player.hltvid + ')');
+    process.send({ message: 'player join' + data.player.name + ' (' + data.player.hltvid + ')' });
+  }
 });
 
 // Emitted when the map is changed.
 live.on('playerQuit', function(data) {
-  console.log('player quit', data.player.name + '(' + data.player.hltvid + ')');
-  process.send({ message: 'player quit' + data.player.name + '(' + data.player.hltvid + ')' });
+  if (data.player != undefined) {
+    console.log('player quit', data.player.name + ' (' + data.player.hltvid + ')');
+    process.send({ message: 'player quit' + data.player.name + ' (' + data.player.hltvid + ')' });
+  }
 });
