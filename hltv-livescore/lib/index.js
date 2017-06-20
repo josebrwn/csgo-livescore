@@ -287,7 +287,7 @@ Livescore.prototype.setTime = function(time) {
     var _s;
     self.time = self.time - 1;
     _s = Number(self.time);
-    if (_s % 5 === 0 && _s > -1) {
+    if (_s % 10 === 0 && _s > -1) {
       self.emit('time', self.time);
     }
   }, 1000);
