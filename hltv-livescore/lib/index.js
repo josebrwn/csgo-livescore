@@ -69,7 +69,7 @@ Livescore.prototype._onConnect = function() {
 
 // invoked by hltv connect event
 Livescore.prototype._onReceive = function(data) {
-  data["listid"] = self.listid; // NB adding the listid to the raw data makes it available to the client
+  data["listid"] = self.listid; // NB
   self.emit('raw', data);
 };
 

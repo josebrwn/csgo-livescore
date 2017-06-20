@@ -76,12 +76,6 @@ live.on('connected', function(data) {
   // ** console.log('***', 'connected');
 });
 
-// Emitted upon connection when a listid is present.
-live.on('readyForMatch', function(data) {
-  // ** console.log('***', 'readyForMatch');
-  // ** console.log(data);
-});
-
 // Emitted immediately before the first scoreboard event is emitted.
 live.on('started', function(data) {
   // ** console.log('***', 'Scorebot has started');
