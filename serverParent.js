@@ -18,9 +18,10 @@ http.listen(3000, function(){
   console.log('listening on *:3000');
 });
 lg.on('connection', function(socket){
+  var clients;
   console.log( 'User ' + socket.id + ' connected' );
   socket.on('disconnect', function(){
-    console.log( 'User ' + socket.id + ' disconnected' );
+    console.log( 'User ' + socket.id + ' disconnected');
   });
   socket.on('msg_to_server', function(room){
     console.log('message: ' + room);
@@ -29,14 +30,18 @@ lg.on('connection', function(socket){
     if(socket.room && socket.room !== room) {
       socket.leave(socket.room);
     }
-    // only create the room if it does not exist
+    // only create the room if it does not exist so new users don't spam old users. TODO test this for reconnect secnarios.
     if (all_rooms.indexOf(room) == -1) {
       var child = cp.fork('./childProcess.js', [room]);
-      child.on('message', function(data) {
-
-      // data["listid"] = self.listid; // TODO may have to try and harden the listid into the child this way, but it's a longshot if this doesn't work ...
-
+      all_rooms.push(room);
+      console.log('forking new process');
+      console.log(all_rooms);
       // The only events you can receive from the child process are error, exit, disconnect, close, and message.
+      child.on('exit', function(data) {
+          var index = all_rooms.indexOf(room);
+          all_rooms.splice(index, 1); // 'close' the room
+      });
+      child.on('message', function(data) {
         try {
           var dataStr = CircularJSON.stringify(data, null, 2);
           dataStr = dataStr.replace(/\\"/g,'\"');
@@ -46,9 +51,7 @@ lg.on('connection', function(socket){
         }
         catch (err) {console.log(err);}
       });
-      all_rooms.push(room);
-      console.log('forking new process');
-      console.log(all_rooms);
+
     }
     socket.join(room);
     lg.in(room).emit('msg_to_client', socket.id + ' has joined room ' + room);
