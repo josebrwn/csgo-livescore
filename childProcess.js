@@ -17,6 +17,8 @@ var old_data; // socketio-wildcard
 var self = this; // 'this', the io client
 self.time = 0;
 self.interval;
+var maxInactive = 600;
+var tick = 120; // remaining inactive alert
 
 // write to log file
 // util = require('util');
@@ -32,7 +34,7 @@ var setInactivityTimer = function(time) {
     var _s;
     self.time = self.time - 1;
     _s = Number(self.time);
-    if (_s % 300 === 0 && _s > -1) { // TODO set to 300
+    if (_s % tick === 0 && _s > -1) { // TODO set to 300
       console.log('inactive time remaining ', self.time);
       process.send('inactive time remaining ' + self.time);
 
@@ -83,7 +85,7 @@ live.on('log', function(data) {
   if (!isLive) { // tone it down
     console.log(data);
     process.send({ message: CircularJSON.stringify(data, null, 2) });
-    setInactivityTimer(1800);
+    setInactivityTimer(maxInactive);
   }
 });
 
@@ -91,7 +93,7 @@ live.on('log', function(data) {
 live.on('started', function(data) {
   console.log('Scorebot has started');
   process.send({ message: 'Scorebot has started' });
-  setInactivityTimer(1800);
+  setInactivityTimer(maxInactive);
 });
 
 // Emitted whenever HLTV sends us a scoreboard update. The scoreboard may not be any different from the last update.
@@ -119,7 +121,7 @@ live.on('scoreboard', function(data) {
     process.send({ message: 'Terrorists: ' + data.teams[1].name + ' (' + data.teams[1].id + ')' + ': ' + t1score });
     console.log('CounterTerrorists: ', data.teams[2].name + '(' + data.teams[2].id + ')', ':', t2score);
     process.send({ message: 'CounterTerrorists: ' + data.teams[2].name + ' (' + data.teams[2].id + ')' + ': ' + t2score });
-    setInactivityTimer(1800);
+    setInactivityTimer(maxInactive);
     }
 });
 
@@ -127,7 +129,7 @@ live.on('scoreboard', function(data) {
 live.on('kill', function(data) {
   console.log(data.killer.name, '<' + data.killer.team.name + '('+ data.killerside +')>', ' killed ', data.victim.name, '<' + data.victim.team.name + '('+ data.victimside +')>', 'with', data.weapon, data.headshot ? '(headshot)' : '');
   process.send({ message: data.killer.name + ' <' + data.killer.team.name + ' ('+ data.killerside +')>' + ' killed ' + data.victim.name + ' <' + data.victim.team.name + ' ('+ data.victimside +')> ' + 'with: ' + data.weapon + ", headshot: " + data.headshot });
-  setInactivityTimer(1800);
+  setInactivityTimer(maxInactive);
 });
 
 // Emitted after a player commits suicide
@@ -135,7 +137,7 @@ live.on('suicide', function(data) {
   if (data.player != undefined) {
     console.log('suicide: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
     process.send({ message: 'suicide: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
-    setInactivityTimer(1800);
+    setInactivityTimer(maxInactive);
   }
 });
 
@@ -144,7 +146,7 @@ live.on('bombPlanted', function(data) {
   if (data.player != undefined) {
     console.log('bomb planted: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
     process.send({ message: 'bomb planted: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
-    setInactivityTimer(1800);
+    setInactivityTimer(maxInactive);
   }
 });
 
@@ -153,7 +155,7 @@ live.on('bombDefused', function(data) {
   if (data.player != undefined) {
     console.log('bomb defused: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
     process.send({ message: 'bomb defused: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
-    setInactivityTimer(1800);
+    setInactivityTimer(maxInactive);
   }
 });
 
@@ -161,7 +163,7 @@ live.on('bombDefused', function(data) {
 live.on('matchStart', function(data) {
   console.log('match start');
   process.send({ message: 'match start' });
-  setInactivityTimer(1800);
+  setInactivityTimer(maxInactive);
 });
 
 // Emitted at the start of every round.
@@ -169,7 +171,7 @@ live.on('roundStart', function(data) {
   console.log('round start');
   process.send({ message: 'round start' });
   isLive = true;
-  setInactivityTimer(1800);
+  setInactivityTimer(maxInactive);
 });
 
 // Emitted at the end of every round.
@@ -183,14 +185,14 @@ live.on('roundEnd', function(data) {
 live.on('restart', function(data) {
   console.log('restart. score reset');
   process.send({ message: 'restart. score reset' });
-  setInactivityTimer(1800);
+  setInactivityTimer(maxInactive);
 });
 
 // Emitted when the map is changed.
 live.on('mapChange', function(data) {
   console.log('map change');
   process.send({ message: 'map change' });
-  setInactivityTimer(1800);
+  setInactivityTimer(maxInactive);
 });
 
 // Emitted when the map is changed.
@@ -199,7 +201,7 @@ live.on('playerJoin', function(data) {
     console.log('player join', data.player.name + ' (' + data.player.hltvid + ')');
     process.send({ message: 'player join' + data.player.name + ' (' + data.player.hltvid + ')' });
   }
-  setInactivityTimer(1800);
+  setInactivityTimer(maxInactive);
 });
 
 // Emitted when the map is changed.
