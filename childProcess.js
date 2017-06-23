@@ -29,12 +29,12 @@ var CircularJSON = require('circular-json'); // expands objects and handles circ
 var setInactivityTimer = function(time) {
   clearInterval(self.interval);
   self.time = time;
-  console.log('clock', self.time);
+  // console.log('interval', self.time);
   self.interval = setInterval(() => {
     var _s;
     self.time = self.time - 1;
     _s = Number(self.time);
-    if (_s % tick === 0 && _s > -1) { // TODO set to 300
+    if (_s % tick === 0 && _s > -1) {
       console.log('inactive time remaining ', self.time);
       process.send('inactive time remaining ' + self.time);
 
@@ -52,10 +52,15 @@ var setInactivityTimer = function(time) {
 // raw data from socketio-wildcard: use this and comment everything below to simply log raw data.
 // live.on('raw', function(data) {
 //   if (data != old_data) {
+//     data["listid"] = live.listid;
+//
 //     console.log(CircularJSON.stringify(data, null, 2));
 //     old_data = data;
+//     process.send(live.listid);
 //   }
 // });
+
+// Log events
 
 // Emitted every time the timer on the scoreboard is updated. data = seconds.
 live.on('time', function(data) {
@@ -99,7 +104,8 @@ live.on('started', function(data) {
 // Emitted whenever HLTV sends us a scoreboard update. The scoreboard may not be any different from the last update.
 live.on('scoreboard', function(data) {
   if (t1id != data.teams[1].id || t1score != data.teams[1].score || t2score != data.teams[2].score || bombplanted != data.bombPlanted || currentround != data.currentRound || map != data.map) {
-      t1id = data.teams[1].id;
+    data["listid"] = live.listid;
+    t1id = data.teams[1].id;
     t2id = data.teams[2].id;
     t1score = data.teams[1].score;
     t2score = data.teams[2].score;
@@ -121,46 +127,15 @@ live.on('scoreboard', function(data) {
     process.send({ message: 'Terrorists: ' + data.teams[1].name + ' (' + data.teams[1].id + ')' + ': ' + t1score });
     console.log('CounterTerrorists: ', data.teams[2].name + '(' + data.teams[2].id + ')', ':', t2score);
     process.send({ message: 'CounterTerrorists: ' + data.teams[2].name + ' (' + data.teams[2].id + ')' + ': ' + t2score });
-    setInactivityTimer(maxInactive);
     }
-});
-
-// Emitted after every kill.
-live.on('kill', function(data) {
-  console.log(data.killer.name, '<' + data.killer.team.name + '('+ data.killerside +')>', ' killed ', data.victim.name, '<' + data.victim.team.name + '('+ data.victimside +')>', 'with', data.weapon, data.headshot ? '(headshot)' : '');
-  process.send({ message: data.killer.name + ' <' + data.killer.team.name + ' ('+ data.killerside +')>' + ' killed ' + data.victim.name + ' <' + data.victim.team.name + ' ('+ data.victimside +')> ' + 'with: ' + data.weapon + ", headshot: " + data.headshot });
-  setInactivityTimer(maxInactive);
-});
-
-// Emitted after a player commits suicide
-live.on('suicide', function(data) {
-  if (data.player != undefined) {
-    console.log('suicide: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
-    process.send({ message: 'suicide: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
     setInactivityTimer(maxInactive);
-  }
 });
 
-// Emitted when the bomb is planted
-live.on('bombPlanted', function(data) {
-  if (data.player != undefined) {
-    console.log('bomb planted: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
-    process.send({ message: 'bomb planted: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
-    setInactivityTimer(maxInactive);
-  }
-});
-
-// Emitted when the bomb is defused
-live.on('bombDefused', function(data) {
-  if (data.player != undefined) {
-    console.log('bomb defused: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
-    process.send({ message: 'bomb defused: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
-    setInactivityTimer(maxInactive);
-  }
-});
+// Match events
 
 // Emitted at the start of every match
 live.on('matchStart', function(data) {
+  isLive = true;
   console.log('match start');
   process.send({ message: 'match start' });
   setInactivityTimer(maxInactive);
@@ -168,17 +143,17 @@ live.on('matchStart', function(data) {
 
 // Emitted at the start of every round.
 live.on('roundStart', function(data) {
+  isLive = true;
   console.log('round start');
   process.send({ message: 'round start' });
-  isLive = true;
   setInactivityTimer(maxInactive);
 });
 
 // Emitted at the end of every round.
 live.on('roundEnd', function(data) {
+  isLive = false;
   console.log('round end');
   process.send({ message: 'round end' });
-  isLive = false;
 });
 
 // Emitted when the score is restarted
@@ -192,7 +167,40 @@ live.on('restart', function(data) {
 live.on('mapChange', function(data) {
   console.log('map change');
   process.send({ message: 'map change' });
-  setInactivityTimer(maxInactive);
+});
+
+// Player events
+
+// Emitted after every kill.
+live.on('kill', function(data) {
+  if (isLive) {
+  console.log(data.killer.name, '<' + data.killer.team.name + '('+ data.killerside +')>', ' killed ', data.victim.name, '<' + data.victim.team.name + '('+ data.victimside +')>', 'with', data.weapon, data.headshot ? '(headshot)' : '');
+  process.send({ message: data.killer.name + ' <' + data.killer.team.name + ' ('+ data.killerside +')>' + ' killed ' + data.victim.name + ' <' + data.victim.team.name + ' ('+ data.victimside +')> ' + 'with: ' + data.weapon + ", headshot: " + data.headshot });
+  }
+});
+
+// Emitted after a player commits suicide
+live.on('suicide', function(data) {
+  if (data.player != undefined) {
+    console.log('suicide: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
+    process.send({ message: 'suicide: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
+  }
+});
+
+// Emitted when the bomb is planted
+live.on('bombPlanted', function(data) {
+  if (data.player != undefined) {
+    console.log('bomb planted: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
+    process.send({ message: 'bomb planted: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
+  }
+});
+
+// Emitted when the bomb is defused
+live.on('bombDefused', function(data) {
+  if (data.player != undefined) {
+    console.log('bomb defused: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
+    process.send({ message: 'bomb defused: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
+  }
 });
 
 // Emitted when the map is changed.
@@ -201,7 +209,6 @@ live.on('playerJoin', function(data) {
     console.log('player join', data.player.name + ' (' + data.player.hltvid + ')');
     process.send({ message: 'player join' + data.player.name + ' (' + data.player.hltvid + ')' });
   }
-  setInactivityTimer(maxInactive);
 });
 
 // Emitted when the map is changed.
