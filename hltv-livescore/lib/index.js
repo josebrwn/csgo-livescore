@@ -134,7 +134,7 @@ Livescore.prototype._onScoreboard = function(event) {
 
   self.getTeams((teams) => {
     var scoreboard = new Livescore.Classes.Scoreboard(event);
-
+    // basically set scoreboard[] to teams[]
     scoreboard.teams[Livescore.Enums.ESide['TERRORIST']] = teams[Livescore.Enums.ESide['TERRORIST']];
     scoreboard.teams[Livescore.Enums.ESide['COUNTERTERRORIST']] = teams[Livescore.Enums.ESide['COUNTERTERRORIST']];
 
@@ -298,11 +298,11 @@ Livescore.prototype.getTime = function(callback) {
   callback(self.time);
 };
 
-// global function. only used once.
+// global function. only used by scoreboard.
 function updateGame(scoreboard) {
   var tPlayers = [];
   var ctPlayers = [];
-
+  // re-create team from the hltv scoreboard, starting with empty player array
   self.teams[Livescore.Enums.ESide['TERRORIST']] = new Livescore.Classes.Team({
     name: scoreboard.terroristTeamName,
     id: scoreboard.tTeamId,
@@ -311,7 +311,6 @@ function updateGame(scoreboard) {
     players: tPlayers,
     history: scoreboard.terroristMatchHistory
   });
-
   self.teams[Livescore.Enums.ESide['COUNTERTERRORIST']] = new Livescore.Classes.Team({
     name: scoreboard.ctTeamName,
     id: scoreboard.ctTeamId,
@@ -320,25 +319,21 @@ function updateGame(scoreboard) {
     players: ctPlayers,
     history: scoreboard.ctMatchHistory
   });
-
+  // now populate the players array
   self.getTeams((teams) => {
     scoreboard.TERRORIST.forEach((pl) => {
       var player = new Livescore.Classes.Player(pl);
       player.team = teams[Livescore.Enums.ESide['TERRORIST']];
-
       self.players[player.name] = player;
       tPlayers.push(player);
     });
-
     scoreboard.CT.forEach((pl) => {
       var player = new Livescore.Classes.Player(pl);
       player.team = teams[Livescore.Enums.ESide['COUNTERTERRORIST']];
-
       self.players[player.name] = player;
       ctPlayers.push(player);
     });
   });
-
   self.scoreboard = scoreboard;
 }
 

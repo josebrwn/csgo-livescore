@@ -16,20 +16,19 @@ var isLive = false;
 var old_data; // socketio-wildcard
 var self = this; // 'this', the io client
 self.time = 0;
-self.interval;
+self.interval; // time remaining.
 var maxInactive = 600;
 var tick = 120; // remaining inactive alert
 
 // write to log file
 // util = require('util');
 var CircularJSON = require('circular-json'); // expands objects and handles circular references
-// var logging = require('./logging');
 
 // call this whenever something happens. emit periodically. if inactive, exits.
 var setInactivityTimer = function(time) {
   clearInterval(self.interval);
   self.time = time;
-  // console.log('interval', self.time);
+  // "Infinite Loop" Execution ~ setInterval().
   self.interval = setInterval(() => {
     var _s;
     self.time = self.time - 1;
@@ -37,12 +36,11 @@ var setInactivityTimer = function(time) {
     if (_s % tick === 0 && _s > -1) {
       console.log('inactive time remaining ', self.time);
       process.send('inactive time remaining ' + self.time);
-
     }
     if (_s <= 0) {
       console.log('exiting due to inactivity');
       process.send('exiting due to inactivity');
-      throw new Error('exiting');
+      throw new Error('exiting'); // child self-destructs
     }
   }, 1000);
 };

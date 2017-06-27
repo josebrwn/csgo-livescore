@@ -30,6 +30,8 @@
           return false;
         });
         socket.on('msg_to_client', function(msg){
+          // var obj = JSON.stringify(msg.toString());
+          // var objMsg = JSON.stringify(msg.message);
           $('#messages').prepend($('<li>').text(msg));
         });
       });
