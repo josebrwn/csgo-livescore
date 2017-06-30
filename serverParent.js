@@ -23,7 +23,6 @@ http.listen(3000, function(){
 });
 
 lg.on('connection', function(socket){
-  var clients;
   console.log( 'User ' + socket.id + ' connected' );
   socket.on('disconnect', function(){
     console.log( 'User ' + socket.id + ' disconnected');

@@ -217,6 +217,12 @@ Livescore.prototype._onRoundEnd = function(event) {
 
   self.setTime(self.options[Livescore.Enums.EOption["FREEZE_TIME"]]);
 
+  /* sets team[].score
+    "data": [
+    "log",
+    "{\"log\":[{\"RoundEnd\":{\"counterTerroristScore\":1,\"terroristScore\":7,\"winner\":\"TERRORIST\",\"winType\":\"Terrorists_Win\"}}]}"
+    ]
+  */
   self.getTeams((teams) => {
     if (Object.keys(teams).length) {
       teams[Livescore.Enums.ESide['TERRORIST']].score = event.terroristScore;
@@ -229,7 +235,7 @@ Livescore.prototype._onRoundEnd = function(event) {
       self.emit('roundEnd', {
         teams: teams,
         winner: teams[winner],
-        roundType: Livescore.Enums.ERoundType[event.winType],
+        roundType: Livescore.Enums.ERoundType[event.winType], // there's a lot of unnecessary obfuscation here
         knifeRound: (self.knifeKills/self.kills) >= 0.8
       });
     }
@@ -321,8 +327,8 @@ function updateGame(scoreboard) {
   });
   // now populate the players array
   self.getTeams((teams) => {
-    scoreboard.TERRORIST.forEach((pl) => {
-      var player = new Livescore.Classes.Player(pl);
+    scoreboard.TERRORIST.forEach((player) => {
+      player = new Livescore.Classes.Player(player);
       player.team = teams[Livescore.Enums.ESide['TERRORIST']];
       self.players[player.name] = player;
       tPlayers.push(player);

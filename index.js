@@ -33,6 +33,8 @@ var currentTime = () => {
 
 // raw data from socketio-wildcard
 
+// TODO clean this up
+
 live.on('raw', function(data) {
   console.log('***');
   if (data != old_data) {
@@ -177,8 +179,9 @@ live.on('roundStart', function(data) {
 
 // Emitted at the end of every round.
 live.on('roundEnd', function(data) {
-  // ** console.log('***', 'roundEnd');
+  // ** console.log('***', 'roundEnd', data);
   isLive = false;
+  // emits: teams, winner, winType, knifeRound
 });
 
 // Emitted when the score is restarted
