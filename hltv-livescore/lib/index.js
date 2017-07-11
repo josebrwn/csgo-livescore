@@ -3,7 +3,8 @@ var io = require('socket.io-client');
 var patch = require('socketio-wildcard')(io.Manager);
 var EE = require('events').EventEmitter;
 var inherits = require('util').inherits; // inherits module uses prototypes to add methods
-var CONNECTION = 'http://scorebot2.hltv.org'; // https://scorebot-secure.hltv.org port 443
+var CONNECTION = 'http://scorebot2.hltv.org';
+// var CONNECTION = 'https://scorebot-secure.hltv.org';
 var PORT = 10022;
 var self; // 'this', the io client
 

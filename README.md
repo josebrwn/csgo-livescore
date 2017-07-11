@@ -17,21 +17,9 @@ This is a wrapper for [andrewda](https://github.com/andrewda)'s [hltv-scorebot](
 
 ## Getting Started
 
-Create an empty git repository with a logs directory at the root, e.g.
-
-```
-.
-root folder
-|-- livescore (Git repo)
-|-- logs
-```
-
 **Install with npm:**
 
-CD to your *livescore folder* and create a Git repository:
 ```CMD
-$ cd livescore
-$ git init
 $ git clone path-to-this-repo
 $ npm install
 ```
@@ -39,6 +27,7 @@ $ npm install
 ## Usage
 ```CMD
 node index.js [listid]
+node serverParent.js
 ```
 
 ## Methods
@@ -84,6 +73,10 @@ Retrieve the time remaining.
 ## Events
 
 Events emit an object containing the parameters listed under each event.
+
+### raw
+
+Uses socket.io-wildcard to emit everything coming from HLTV server.
 
 ### connected
 

@@ -7,6 +7,7 @@ var io = require('socket.io')(http); // use io.close() to disconnect all users d
 // var Livescore = require('./hltv-livescore');
 var cp = require('child_process');
 var CircularJSON = require('circular-json');
+// var logging = require('./logging'); // TODO manage logging NODE_ENV
 
 // create a namespace for livegames:
 var lg = io.of('/livegames');
@@ -20,6 +21,7 @@ app.get('/', function(req, res){
 });
 http.listen(3000, function(){
   console.log('listening on *:3000');
+  console.log(process.env.NODE_ENV);
 });
 
 lg.on('connection', function(socket){
@@ -51,6 +53,7 @@ lg.on('connection', function(socket){
       // emit any message received by a child process
       child.on('message', function(data) {
         try {
+          data = data.replace(/de_cbble/g, 'de_cobblestone');
           var dataStr = CircularJSON.stringify(data, null, 2);
           dataStr = dataStr.replace(/\\"/g,'\"');
           dataStr = dataStr.replace(/\\n/g, '');
