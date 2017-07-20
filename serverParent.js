@@ -53,7 +53,6 @@ lg.on('connection', function(socket){
       // emit any message received by a child process
       child.on('message', function(data) {
         try {
-          data = data.replace(/de_cbble/g, 'de_cobblestone');
           var dataStr = CircularJSON.stringify(data, null, 2);
           dataStr = dataStr.replace(/\\"/g,'\"');
           dataStr = dataStr.replace(/\\n/g, '');
@@ -66,3 +65,13 @@ lg.on('connection', function(socket){
     lg.in(room).emit('msg_to_client', socket.id + ' has joined room ' + room);
   });
 });
+
+// the API probably expects well-formed JSON
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}

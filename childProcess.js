@@ -66,7 +66,7 @@ live.on('time', function(data) {
   var minutes = Math.floor(adjusted / 60);
   var seconds = adjusted - minutes * 60;
   console.log('time remaining:', minutes + ':' + String('0' + seconds).slice(-2));
-  process.send({ message: 'time remaining: ' + minutes + ':' + String('0' + seconds).slice(-2) });
+  process.send('time remaining: ' + minutes + ':' + String('0' + seconds).slice(-2));
 });
 
 // Emitted when clock resets at matchStart, roundEnd, roundStart, bombPlanted (, etc.?)
@@ -75,7 +75,7 @@ live.on('clock', function(data) {
   var minutes = Math.floor(adjusted / 60);
   var seconds = adjusted - minutes * 60;
   console.log('clock started at:', minutes + ':' + String('0' + seconds).slice(-2));
-  process.send({ message: 'clock started at: ' + minutes + ':' + String('0' + seconds).slice(-2) });
+  process.send('clock started at: ' + minutes + ':' + String('0' + seconds).slice(-2));
 });
 
 // debug info - add wherenever needed to clarify events
@@ -85,17 +85,17 @@ live.on('debug', function(data) {
 
 // Emitted whenever HLTV feels like giving us logs (after kills, round events, etc)
 live.on('log', function(data) {
-  if (!isLive) { // tone it down
+  // if (!isLive) { // tone it down
     console.log(data);
-    process.send({ message: CircularJSON.stringify(data, null, 2) });
+    process.send(CircularJSON.stringify(data, null, 2) );
     setInactivityTimer(maxInactive);
-  }
+  // }
 });
 
 // Emitted immediately before the first scoreboard event is emitted.
 live.on('started', function(data) {
   console.log('Scorebot has started');
-  process.send({ message: 'Scorebot has started' });
+  process.send('Scorebot has started');
   setInactivityTimer(maxInactive);
 });
 
@@ -111,20 +111,20 @@ live.on('scoreboard', function(data) {
     currentround = data.currentRound;
     map = data.map;
     // scoreboard is emitted both at roundStart and roundEnd
-    if (!isLive) { // tone it down
+    // if (!isLive) { // tone it down
       console.log(CircularJSON.stringify(data, null, 2));
-      process.send({ message: CircularJSON.stringify(data, null, 2) });
-    }
-    console.log('map:', map);
-    process.send({ message: map });
-    console.log('currentRound: ', currentround);
-    process.send({ message: 'current round: ' + currentround });
-    console.log('bombPlanted: ', bombplanted);
-    process.send({ message: 'bomb planted: ' + bombplanted });
-    console.log('Terrorists: ', data.teams[1].name + ' (' + data.teams[1].id + ')', ':', t1score);
-    process.send({ message: 'Terrorists: ' + data.teams[1].name + ' (' + data.teams[1].id + ')' + ': ' + t1score });
-    console.log('CounterTerrorists: ', data.teams[2].name + '(' + data.teams[2].id + ')', ':', t2score);
-    process.send({ message: 'CounterTerrorists: ' + data.teams[2].name + ' (' + data.teams[2].id + ')' + ': ' + t2score });
+      process.send(CircularJSON.stringify(data, null, 2));
+    // }
+    // console.log('map:', map);
+    // process.send(map });
+    // console.log('currentRound: ', currentround);
+    // process.send('current round: ' + currentround);
+    // console.log('bombPlanted: ', bombplanted);
+    // process.send('bomb planted: ' + bombplanted);
+    // console.log('Terrorists: ', data.teams[1].name + ' (' + data.teams[1].id + ')', ':', t1score);
+    // process.send('Terrorists: ' + data.teams[1].name + ' (' + data.teams[1].id + ')' + ': ' + t1score);
+    // console.log('CounterTerrorists: ', data.teams[2].name + '(' + data.teams[2].id + ')', ':', t2score);
+    // process.send('CounterTerrorists: ' + data.teams[2].name + ' (' + data.teams[2].id + ')' + ': ' + t2score);
     }
     setInactivityTimer(maxInactive);
 });
@@ -135,7 +135,7 @@ live.on('scoreboard', function(data) {
 live.on('matchStart', function(data) {
   isLive = true;
   console.log('match start');
-  process.send({ message: 'match start' });
+  process.send('match start');
   setInactivityTimer(maxInactive);
 });
 
@@ -143,7 +143,7 @@ live.on('matchStart', function(data) {
 live.on('roundStart', function(data) {
   isLive = true;
   console.log('round start');
-  process.send({ message: 'round start' });
+  process.send('round start');
   setInactivityTimer(maxInactive);
 });
 
@@ -151,37 +151,37 @@ live.on('roundStart', function(data) {
 live.on('roundEnd', function(data) {
   isLive = false;
   console.log('round end');
-  process.send({ message: 'round end' });
+  process.send('round end');
 });
 
 // Emitted when the score is restarted
 live.on('restart', function(data) {
   console.log('restart. score reset');
-  process.send({ message: 'restart. score reset' });
+  process.send('restart. score reset');
   setInactivityTimer(maxInactive);
 });
 
 // Emitted when the map is changed.
 live.on('mapChange', function(data) {
   console.log('map change');
-  process.send({ message: 'map change' });
+  process.send('map change');
 });
 
 // Player events
 
 // Emitted after every kill.
 live.on('kill', function(data) {
-  if (isLive) {
+  // if (isLive) {
   console.log(data.killer.name, '<' + data.killer.team.name + '('+ data.killerside +')>', ' killed ', data.victim.name, '<' + data.victim.team.name + '('+ data.victimside +')>', 'with', data.weapon, data.headshot ? '(headshot)' : '');
-  process.send({ message: data.killer.name + ' <' + data.killer.team.name + ' ('+ data.killerside +')>' + ' killed ' + data.victim.name + ' <' + data.victim.team.name + ' ('+ data.victimside +')> ' + 'with: ' + data.weapon + ", headshot: " + data.headshot });
-  }
+  process.send(data.killer.name + ' <' + data.killer.team.name + ' ('+ data.killerside +')>' + ' killed ' + data.victim.name + ' <' + data.victim.team.name + ' ('+ data.victimside +')> ' + 'with: ' + data.weapon + ", headshot: " + data.headshot);
+  // }
 });
 
 // Emitted after a player commits suicide
 live.on('suicide', function(data) {
   if (data.player != undefined) {
     console.log('suicide: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
-    process.send({ message: 'suicide: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
+    process.send('suicide: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>' );
   }
 });
 
@@ -189,7 +189,7 @@ live.on('suicide', function(data) {
 live.on('bombPlanted', function(data) {
   if (data.player != undefined) {
     console.log('bomb planted: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
-    process.send({ message: 'bomb planted: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
+    process.send('bomb planted: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>');
   }
 });
 
@@ -197,7 +197,7 @@ live.on('bombPlanted', function(data) {
 live.on('bombDefused', function(data) {
   if (data.player != undefined) {
     console.log('bomb defused: ', data.player.name + '(' + data.player.hltvid + ')', '<', data.player.team.name + '(' + data.player.team.id + ')>' );
-    process.send({ message: 'bomb defused: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>'  });
+    process.send('bomb defused: ' + data.player.name + ' (' + data.player.hltvid + ') ' + '<' + data.player.team.name + ' (' + data.player.team.id + ')>');
   }
 });
 
@@ -205,7 +205,7 @@ live.on('bombDefused', function(data) {
 live.on('playerJoin', function(data) {
   if (data.player != undefined) {
     console.log('player join', data.player.name + ' (' + data.player.hltvid + ')');
-    process.send({ message: 'player join' + data.player.name + ' (' + data.player.hltvid + ')' });
+    process.send('player join' + data.player.name + ' (' + data.player.hltvid + ')');
   }
 });
 
@@ -213,6 +213,6 @@ live.on('playerJoin', function(data) {
 live.on('playerQuit', function(data) {
   if (data.player != undefined) {
     console.log('player quit', data.player.name + ' (' + data.player.hltvid + ')');
-    process.send({ message: 'player quit' + data.player.name + ' (' + data.player.hltvid + ')' });
+    process.send('player quit' + data.player.name + ' (' + data.player.hltvid + ')');
   }
 });

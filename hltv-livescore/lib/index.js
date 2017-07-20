@@ -3,9 +3,10 @@ var io = require('socket.io-client');
 var patch = require('socketio-wildcard')(io.Manager);
 var EE = require('events').EventEmitter;
 var inherits = require('util').inherits; // inherits module uses prototypes to add methods
-var CONNECTION = 'http://scorebot2.hltv.org';
-// var CONNECTION = 'https://scorebot-secure.hltv.org';
-var PORT = 10022;
+// var CONNECTION = 'http://scorebot2.hltv.org';
+// var PORT = 10022;
+var CONNECTION = 'https://scorebot-secure.hltv.org';
+var PORT = 443;  // 53132 // , {secure: true}
 var self; // 'this', the io client
 
 // Livescore module exports a socket.io-client
