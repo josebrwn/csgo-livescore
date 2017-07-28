@@ -15,12 +15,15 @@ var lg = io.of('/livegames');
 // globals
 var all_rooms = [];
 
+var port = process.env.PORT || 3000;
+
+
 // start the server
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 http.listen(3000, function(){
-  console.log('listening on *:3000');
+  console.log('listening on *:'+port);
   console.log(process.env.NODE_ENV);
 });
 

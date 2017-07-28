@@ -1,0 +1,26 @@
+{
+  "apps" : [
+    {
+      "name": "livescore",
+      "script": "/home/***REMOVED***/livescore/serverParent.js",
+      "cwd": "/home/***REMOVED***/livescore/",
+      "watch": false,
+      "env": {
+        "PORT": 3000,
+        "NODE_ENV": "development"
+      },
+      "env_development": {
+        "PORT": 3000,
+        "NODE_ENV": "development"
+      },
+      "env_staging": {
+        "PORT": 3000,
+        "NODE_ENV": "production"
+      },
+      "env_production": {
+        "PORT": 3000,
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}
