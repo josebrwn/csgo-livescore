@@ -204,15 +204,15 @@ live.on('bombDefused', function(data) {
 // Emitted when the map is changed.
 live.on('playerJoin', function(data) {
   if (data.player != undefined) {
-    console.log('player join', data.player.name + ' (' + data.player.hltvid + ')');
-    process.send('player join' + data.player.name + ' (' + data.player.hltvid + ')');
+    console.log('player join ', data.player.name + ' (' + data.player.hltvid + ')');
+    process.send('player join ' + data.player.name + ' (' + data.player.hltvid + ')');
   }
 });
 
 // Emitted when the map is changed.
 live.on('playerQuit', function(data) {
   if (data.player != undefined) {
-    console.log('player quit', data.player.name + ' (' + data.player.hltvid + ')');
-    process.send('player quit' + data.player.name + ' (' + data.player.hltvid + ')');
+    console.log('player quit ', data.player.name + ' (' + data.player.hltvid + ')');
+    process.send('player quit ' + data.player.name + ' (' + data.player.hltvid + ')');
   }
 });

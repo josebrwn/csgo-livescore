@@ -40,7 +40,7 @@ lg.on('connection', function(socket){
       socket.leave(socket.room);
     }
     // create the room if it does not exist - a room ceases to exist when child self-terminates
-    if (all_rooms.indexOf(room) == -1) {
+    if (all_rooms.indexOf(room) === -1) {
 
       // fork the child process
       var child = cp.fork('./childProcess.js', [room]);
