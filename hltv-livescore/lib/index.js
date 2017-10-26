@@ -3,11 +3,13 @@ var io = require('socket.io-client');
 var patch = require('socketio-wildcard')(io.Manager);
 var EE = require('events').EventEmitter;
 var inherits = require('util').inherits; // inherits module uses prototypes to add methods
-// var CONNECTION = 'http://scorebot2.hltv.org';
-// var PORT = 10022;
-var CONNECTION = 'https://scorebot-secure.hltv.org';
-var PORT = 443;  // 53132 // , {secure: true}
+var CONNECTION = 'http://scorebot2.hltv.org';
+var PORT = 10022;
+// var CONNECTION = 'https://scorebot-secure.hltv.org';
+// var PORT = '443';  // 53132 // , {secure: true}
 var self; // 'this', the io client
+
+// 61:42["readyForMatch","{\"token\":\"\",\"listId\":\"2316343\"}"]
 
 // Livescore module exports a socket.io-client
 // options "listid" is sent to the module when it's invoked
@@ -19,7 +21,7 @@ function Livescore(options) {
   self.url = options.url || CONNECTION;
   self.port = options.port || PORT;
   // socket.io-client invoked
-  self.socket = io.connect(self.url + ':' + self.port, {reconnection: false, forceNew: true}); // 6-15-17, added force new connection
+  self.socket = io.connect(self.url + ":" + self.port); // , {secure: true}
   patch(self.socket); // piggyback socketio-wildcard
 
   self.connected = false;
@@ -62,10 +64,18 @@ Livescore.prototype._onConnect = function() {
   readyForMatch expects a single string:
   self.gamesList = '2310804';
   readyForScores expects an integer array:
-  self.gamesList = [2310804];
+  ["readyForScores","{\"token\":\"\",\"listIds\":[2316343,2316090,2316304,2316101,2316153]}"]
+  self.gamesList =[2316343,2316090,2316304,2316101,2316153];
   */
+  // self.listid =[2316343,2316090,2316304,2316101,2316153];
+
   if (self.listid) {
     self.socket.emit('readyForMatch', self.listid);
+    self.emit('debug', self.listid);
+  }
+  else {
+    self.emit('debug', 'nothing in self.listid');
+
   }
 };
 
