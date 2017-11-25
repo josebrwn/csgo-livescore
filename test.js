@@ -1,11 +1,13 @@
 const sql = require('mssql')
 
 const config = {
-  user: '***REMOVED***',
-  password: '***REMOVED***',
-  server: 'localhost', // You can use 'localhost\\instance' to connect to named instance
-  database: 'staging'
-};
+  "user": '***REMOVED***',
+  "password": '***REMOVED***',
+  "server": '***REMOVED***', // You can use 'localhost\\instance' to connect to named instance
+  "database": 'staging',
+  "options": {
+    "encrypt": true
+  }};
 var value = 1;
 
 sql.connect(config).then(() => {

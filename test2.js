@@ -1,23 +1,26 @@
-const sql = require('mssql')
+const sql = require('mssql');
 
 const config = {
-  user: '***REMOVED***',
-  password: '***REMOVED***',
-  server: 'localhost', // You can use 'localhost\\instance' to connect to named instance
-  database: 'staging'
-};
+  "user": '***REMOVED***',
+  "password": '***REMOVED***',
+  "server": '***REMOVED***', // You can use 'localhost\\instance' to connect to named instance
+  "database": 'staging',
+  "options": {
+    "encrypt": true
+  }};
 var value = 1000;
 
 sql.connect(config, err => {
   new sql.Request().query(`select count(*) as total1 from HLTVMatchEvent where event_id > ${value}`, (err, result) => {
       // ... error checks
 
-      console.dir(result)
-  })
+      console.dir(result);
+  });
   new sql.Request().query(`select count(*) as total2 from HLTVMatchEvent where event_id < ${value}`, (err, result) => {
       // ... error checks
-      console.dir(result)
-  })
+      console.dir(result);
+      sql.close();
+  });
   // Stored Procedure
   // new sql.Request()
   // .input('input_parameter', sql.Int, value)
@@ -27,9 +30,10 @@ sql.connect(config, err => {
   //
   //     console.dir(result)
   // })
-})
+});
 
 sql.on('error', err => {
     // ... error handler
     console.log('error', err);
+    sql.close();
 });
