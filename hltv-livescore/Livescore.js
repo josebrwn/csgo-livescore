@@ -1,4 +1,4 @@
-module.exports = require('./lib/');
+module.exports = require('./lib/index.js');
 
 module.exports.Classes = {
     Player: require('./lib/classes/Player.js'),

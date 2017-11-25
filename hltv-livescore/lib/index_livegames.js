@@ -8,14 +8,19 @@ var PORT = 10022;
 // var PORT = 443;  // 53132 // , {secure: true}
 var self;
 
+const cookie = 'connect.sid=xyz';
+
 function Livescore(options) {
   self = this;
   self.connected = false;
   options = options || {};
+  ////////////
   self.gamesList = options.gamesList || self.gamesList || null;
+  self.listid = options.listid || null;
+  ///////////
   self.url = options.url || CONNECTION;
   self.port = options.port || PORT;
-  self.socket = io(self.url + ':' + self.port);
+  self.socket = io(self.url + ':' + self.port, { extraHeaders: { cookie }} );
   // piggyback using the event-emitter bundled with socket.io client
   patch(self.socket);
   self.options = {};
@@ -39,8 +44,9 @@ Livescore.prototype._onConnect = function() {
   readyForScores expects an integer array - [2310804,13235,2346246,24564564];
   */
 
-  if (self.gamesList) {
-    self.socket.emit('readyForScores', self.gamesList);
+
+  if (self.listid) {
+    self.socket.emit('readyForMatch', self.listid);
     // self.emit('raw', self.gamesList); // can't do this because it'll trigger rogue api calls
   }
 };

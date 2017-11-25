@@ -9,11 +9,6 @@ var PORT = 10022;
 // var PORT = '443';  // 53132 // , {secure: true}
 var self; // 'this', the io client
 
-// 61:42["readyForMatch","{\"token\":\"\",\"listId\":\"2316343\"}"]
-
-// Livescore module exports a socket.io-client
-// options "listid" is sent to the module when it's invoked
-//
 function Livescore(options) {
   self = this; // the calling context (Livescore) object with a socket = socket.io-client, inheriting from EventEmitter.
   options = options || {};
@@ -21,7 +16,7 @@ function Livescore(options) {
   self.url = options.url || CONNECTION;
   self.port = options.port || PORT;
   // socket.io-client invoked
-  self.socket = io.connect(self.url + ":" + self.port); // , {secure: true}
+  self.socket = io.connect(self.url + ":" + self.port, {	jar: true,	rejectUnauthorized: false,	followAllRedirects: true,  secure: true}); // , {secure: true}
   patch(self.socket); // piggyback socketio-wildcard
 
   self.connected = false;
@@ -62,12 +57,10 @@ Livescore.prototype._onConnect = function() {
 
   /*
   readyForMatch expects a single string:
-  self.gamesList = '2310804';
+  self.listid = '2310804';
   readyForScores expects an integer array:
-  ["readyForScores","{\"token\":\"\",\"listIds\":[2316343,2316090,2316304,2316101,2316153]}"]
   self.gamesList =[2316343,2316090,2316304,2316101,2316153];
   */
-  // self.listid =[2316343,2316090,2316304,2316101,2316153];
 
   if (self.listid) {
     self.socket.emit('readyForMatch', self.listid);
