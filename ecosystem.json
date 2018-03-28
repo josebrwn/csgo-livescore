@@ -2,8 +2,8 @@
   "apps" : [
     {
       "name": "livescore",
-      "script": "/home/***REMOVED***/livescore/serverParent.js",
-      "cwd": "/home/***REMOVED***/livescore/",
+      "script": "serverParent.js",
+      "cwd": "livescore/",
       "watch": false,
       "env": {
         "PORT": 3000,
