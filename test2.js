@@ -14,11 +14,11 @@ sql.connect(config, err => {
   new sql.Request().query(`select count(*) as total1 from HLTVMatchEvent where event_id > ${value}`, (err, result) => {
       // ... error checks
 
-      console.dir(result);
+      console.log(result.recordset);
   });
   new sql.Request().query(`select count(*) as total2 from HLTVMatchEvent where event_id < ${value}`, (err, result) => {
       // ... error checks
-      console.dir(result);
+      console.log(result.recordset);
       sql.close();
   });
   // Stored Procedure

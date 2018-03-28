@@ -17,7 +17,6 @@ var all_rooms = [];
 
 var port = process.env.PORT || 3000;
 
-
 // start the server
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');

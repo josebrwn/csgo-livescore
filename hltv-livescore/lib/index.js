@@ -3,10 +3,10 @@ var io = require('socket.io-client');
 var patch = require('socketio-wildcard')(io.Manager);
 var EE = require('events').EventEmitter;
 var inherits = require('util').inherits; // inherits module uses prototypes to add methods
-var CONNECTION = 'http://scorebot2.hltv.org';
-var PORT = 10022;
-// var CONNECTION = 'https://scorebot-secure.hltv.org';
-// var PORT = '443';  // 53132 // , {secure: true}
+// var CONNECTION = 'http://scorebot2.hltv.org';
+// var PORT = 10022;
+var CONNECTION = 'https://scorebot-secure.hltv.org';
+var PORT = 80;
 var self; // 'this', the io client
 
 function Livescore(options) {
@@ -16,7 +16,9 @@ function Livescore(options) {
   self.url = options.url || CONNECTION;
   self.port = options.port || PORT;
   // socket.io-client invoked
-  self.socket = io.connect(self.url + ":" + self.port, {	jar: true,	rejectUnauthorized: false,	followAllRedirects: true,  secure: true}); // , {secure: true}
+  // self.socket = io.connect(self.url + ':' + self.port);
+  self.socket = io.connect(this.url + (this.port === 80 ? '' : ':' + PORT));
+
   patch(self.socket); // piggyback socketio-wildcard
 
   self.connected = false;
@@ -45,7 +47,7 @@ Livescore.Classes = require('../Livescore.js').Classes;
 
 // invoked by hltv connect event
 Livescore.prototype._onConnect = function() {
-  if (!self.connected) {
+  if (!self.connected) { // this is just a local variable
     self.connected = true;
     // these are the only other hltv events
     // *************************************************************************** //
@@ -53,15 +55,20 @@ Livescore.prototype._onConnect = function() {
     self.socket.on('scoreboard', self._onScoreboard);
     self.socket.on('*', self._onReceive); // NB uses wildcard * - captures everything
     // *************************************************************************** //
+    console.log(self.socket, 'connected!?');
   }
 
-  /*
-  readyForMatch expects a single string:
-  self.listid = '2310804';
-  readyForScores expects an integer array:
-  self.gamesList =[2316343,2316090,2316304,2316101,2316153];
-  */
+  // readyForMatch expects a listId, readyForScores expects listIds
+  self.listid = JSON.stringify({
+    token: '',
+    listId: self.listid
+  }) || null;
+  console.log(self.listid);
 
+  /*
+  readyForMatch expects a single string - '2310804';
+  readyForScores expects an integer array - [2310804,13235,2346246,24564564];
+  */
   if (self.listid) {
     self.socket.emit('readyForMatch', self.listid);
     self.emit('debug', self.listid);
