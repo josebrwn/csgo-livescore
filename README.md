@@ -15,6 +15,8 @@
 
 This is a wrapper for [andrewda](https://github.com/andrewda)'s [hltv-scorebot](https://github.com/andrewda/hltv-livescore), v. 1.0.0.
 
+Real time logs from the CSGO server are returned to the browser via a scorebot.io-client.
+
 ## Getting Started
 
 **Install with npm:**
@@ -27,7 +29,7 @@ $ npm install
 ## Usage
 ```CMD
 node index.js [listid]
-node serverParent.js
+node serverParent.js  
 ```
 
 ## Methods
