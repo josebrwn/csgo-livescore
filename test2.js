@@ -1,9 +1,9 @@
 const sql = require('mssql');
 
 const config = {
-  "user": '***REMOVED***',
-  "password": '***REMOVED***',
-  "server": '***REMOVED***', // You can use 'localhost\\instance' to connect to named instance
+  "user": '',
+  "password": '',
+  "server": '', // You can use 'localhost\\instance' to connect to named instance
   "database": 'staging',
   "options": {
     "encrypt": true
