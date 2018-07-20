@@ -1,0 +1,13 @@
+[color]
+    ui = true
+[color "status"]
+    changed = red bold
+    untracked = red bold
+    added = green bold
+.
+
+git config color.ui "auto"
+git config color.status.changed "red bold"
+git config color.status.untracked "blue bold"
+git config color.status.added "green bold"
+git config color.status.header "white normal dim"
