@@ -27,7 +27,7 @@ $ npm install
 ```
 
 ## Usage
-```console
+```js
 node index.js [listid]
 node serverParent.js  
 ```
