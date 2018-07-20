@@ -21,13 +21,13 @@ Real time logs from the CSGO server are returned to the browser via a scorebot.i
 
 **Install with npm:**
 
-```CMD
+```console
 $ git clone path-to-this-repo
 $ npm install
 ```
 
 ## Usage
-```CMD
+```console
 node index.js [listid]
 node serverParent.js  
 ```
